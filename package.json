@@ -7,7 +7,7 @@
     "test": "tape test/*.js"
   },
   "bin": {
-    "tape-run": "./bin/run.js"
+    "tape-run2": "./bin/run.js"
   },
   "dependencies": {
     "browser-run2": "~1.0.1",
