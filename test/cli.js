@@ -1,44 +1,50 @@
 var test = require('tape');
 var fs = require('fs');
-var spawn = require('child_process').spawn;
-var through = require('through');
+var exec = require('child_process').exec;
 
-var passing = ['one'];
-var failing = ['fail'];
-var fixtures = passing.concat(failing);
+var browserify = __dirname + '/../node_modules/.bin/browserify'
+var tape = __dirname + '/../node_modules/.bin/tape'
+var tapeRun = __dirname + '/../bin/run.js'
 
-/**
- * Run all the fixtures.
- */
+var passTest = __dirname + '/fixtures/one.js'
+var failTest = __dirname + '/fixtures/fail.js'
 
-fixtures.forEach(function (name) {
-  test('cli: ' + name, function (t) {
-    t.plan(2);
-
-    var browserify = spawn(__dirname + '/../node_modules/.bin/browserify', [
-      __dirname + '/fixtures/' + name + '.js',
-    ]);
-    browserify.stderr.pipe(process.stderr, { end: false });
-
-    var run = spawn('node', [ __dirname + '/../bin/run.js' ]);
-    run.stderr.pipe(process.stderr, { end: false });
-
-    run.on('exit', function (code) {
-      t.equals(code, Number(passing.indexOf(name) == -1));
-    });
-
-    browserify.stdout.pipe(run.stdin);
-    run.stdout.pipe(through(write, end));
-
-    var out = '';
-
-    function write (chunk) { out += chunk.toString() }
-    function end () {
-      t.equals(out, read(__dirname + '/fixtures/' + name + '.txt'));
-    }
+test('passing tests', function(t) {
+  exec(tape + ' ' + passTest, function(err, expected) {
+    t.ifError(err, 'tape test executed correctly')
+    expected = expected.trim()
+    exec(browserify + ' ' + passTest + ' | ' + tapeRun + ' --browser chrome', function(err, stdout, stderr) {
+      stdout = stdout.trim()
+      t.ifError(err, 'tape-run test executed correctly')
+      t.equal(
+        stdout,
+        expected
+      )
+      t.end()
+    })
   })
-});
+})
 
-function read (path) {
-  return fs.readFileSync(path, 'utf8').toString();
+test('failing tests', function(t) {
+  exec(tape + ' ' + failTest, function(err, expected) {
+    t.ok(err, 'tape test should fail')
+    expected = expected.trim()
+    exec(browserify + ' ' + failTest + ' | ' + tapeRun + ' --browser chrome', function(err, stdout, stderr) {
+      stdout = stdout.trim()
+      t.ok(err, 'tape-run test should fail')
+      t.equal(
+        removeDynamicContent(expected),
+        removeDynamicContent(stdout)
+      )
+      t.end()
+    })
+  })
+})
+
+function removeDynamicContent(text) {
+  return text.split('\n')
+  .filter(function(line) {
+    return line.trim().indexOf('at: ') !== 0
+  })
+  .join('\n').trim()
 }
