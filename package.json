@@ -11,14 +11,14 @@
   },
   "dependencies": {
     "browser-run2": "~1.0.1",
-    "optimist": "~0.5.0",
+    "optimist": "~0.5.2",
     "tap-finished": "0.0.0",
     "through": "~2.3.4",
     "throughout": "0.0.0"
   },
   "devDependencies": {
-    "tape": "~1.0.2",
-    "browserify": "~2.14.1"
+    "browserify": "~6.0.2",
+    "tape": "~3.0.0"
   },
   "keywords": [
     "tape",
