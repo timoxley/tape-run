@@ -1,9 +1,12 @@
 
-# tape-run
+# tape-run2
 
 A [tape](https://github.com/substack/tape) test runner that runs your tests in
 a (headless) browser and returns 0/1 as exit code, so you can use it as your
 `npm test` script.
+
+Same as [juliangruber/tape-run](https://github.com/juliangruber/tape-run), but uses [timoxley/browser-run2](http://npm.im/browser-run2) and thus
+[benderjs/browser-launcher2](https://github.com/benderjs/browser-launcher2) instead of [substack/browser-launcher](https://github.com/substack/browser-launcher), due to [substack/browser-launcher/issues/34](https://github.com/substack/browser-launcher/issues/34).
 
 ## Usage
 
